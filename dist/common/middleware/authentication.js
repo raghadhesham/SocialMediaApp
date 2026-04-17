@@ -15,12 +15,12 @@ const authenticate = async (req, res, next) => {
     req.userEmail = decoded.email;
     req.role = decoded.role;
     req.user = decoded;
-    next();
     const userRepository = new user_repository_1.default(user_model_1.default);
-    // const user = await userRepository.findById(req.userId);
-    // if (!user) {
-    //     throw new Error("user doesn't exist");
-    //   }
+    const user = await userRepository.findById({ id: req.userId });
+    if (!user) {
+        throw new Error("user doesn't exist");
+    }
+    next();
 };
 exports.authenticate = authenticate;
 //# sourceMappingURL=authentication.js.map

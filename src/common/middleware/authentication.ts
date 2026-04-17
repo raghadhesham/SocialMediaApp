@@ -3,7 +3,6 @@ import {
   extractTokenFromHeaders,
   verifyAccessToken,
 } from "../utils/auth/token";
-import { AppError } from "../utils/response/global-error-handler";
 import { IUser } from "../../auth.dto";
 import { Types } from "mongoose";
 import userModel from "../../models/user.model";
@@ -11,7 +10,7 @@ import BaseRepository from "../../DB/repository/base.repository";
 import UserRepository from "../../DB/repository/user.repository";
 declare global {
   namespace Express {
-    interface Request {
+    interface Request { //3ayzeen nzawed 7agat 3l properties elly mawgoda fe Request bta3t express
       userId?: Types.ObjectId;
       role?: string;
       userEmail?: string;
@@ -31,11 +30,11 @@ export const authenticate = async (
   req.userEmail = decoded.email
   req.role = decoded.role
   req.user = decoded
-  next();
   const userRepository = new UserRepository(userModel);
-  // const user = await userRepository.findById(req.userId);
-  // if (!user) {
-  //     throw new Error("user doesn't exist");
-  //   }
+  const user = await userRepository.findById({id:req.userId!});
+  if (!user) {
+    throw new Error("user doesn't exist");
+  }
+  next();
   
 };

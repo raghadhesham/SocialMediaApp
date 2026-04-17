@@ -11,6 +11,7 @@ const cors_1 = __importDefault(require("cors"));
 const config_services_1 = require("./config/config.services");
 const global_error_handler_1 = require("./common/utils/response/global-error-handler");
 const connectionDB_1 = require("./DB/connectionDB");
+const auth_controllers_1 = require("./modules/auth/auth.controllers");
 const limiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 15 * 60 * 1000,
     max: 3,
@@ -24,6 +25,7 @@ const bootstrap = async () => {
     app.use(express_1.default.json(), (0, cors_1.default)());
     app.use((0, helmet_1.default)());
     app.use(limiter);
+    app.use("/auth", auth_controllers_1.authRouter);
     app.get("/", (req, res) => {
         res.status(200).json({ message: "Hi! Welcome to our app!" });
     });

@@ -9,6 +9,7 @@ import {
   globalErrorHandler,
 } from "./common/utils/response/global-error-handler";
 import { checkConnectionDb } from "./DB/connectionDB";
+import { authRouter } from "./modules/auth/auth.controllers";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -25,6 +26,7 @@ const bootstrap = async () =>  {
   app.use(express.json(), cors());
   app.use(helmet());
   app.use(limiter);
+  app.use("/auth",authRouter)
   app.get("/", (req: Request, res: Response) => {
     res.status(200).json({ message: "Hi! Welcome to our app!" });
   });

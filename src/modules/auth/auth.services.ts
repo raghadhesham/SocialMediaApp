@@ -5,7 +5,7 @@ import { Model } from "mongoose";
 import UserRepository from "../../DB/repository/user.repository";
 import { hash } from "bcrypt";
 
-class AuthService{
+export class AuthService{
     private readonly _userModel=new UserRepository(UserModel)
     constructor() { }
     signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -41,4 +41,3 @@ class AuthService{
         });
      }
 }
-export default new AuthService();
