@@ -8,7 +8,9 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const config_services_1 = require("../config/config.services");
 const checkConnectionDb = async () => {
     try {
-        await mongoose_1.default.connect(config_services_1.config.db.MONGODB_URI);
+        await mongoose_1.default.connect(config_services_1.config.db.MONGODB_URI, {
+            dbName: "SocialMediaApp"
+        });
         console.log("Connected to MongoDB");
     }
     catch (error) {

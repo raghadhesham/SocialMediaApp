@@ -34,7 +34,9 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = void 0;
+const bcrypt_1 = require("bcrypt");
 const mongoose_1 = __importStar(require("mongoose"));
+const user_enum_1 = require("../common/enum/user.enum");
 exports.UserSchema = new mongoose_1.default.Schema({
     firstName: {
         type: String,
@@ -53,7 +55,9 @@ exports.UserSchema = new mongoose_1.default.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function () {
+            return this.provider === user_enum_1.providerEnum.system ? true : false;
+        },
     },
     gender: {
         type: String,
@@ -83,6 +87,7 @@ exports.UserSchema = new mongoose_1.default.Schema({
         type: Boolean,
         default: false,
     },
+    provider: {},
 });
 exports.UserSchema.virtual("userName")
     .get(function () {
@@ -94,6 +99,21 @@ exports.UserSchema.virtual("userName")
         lastName: value.split(" ")[1],
     });
 });
+exports.UserSchema.pre("save", async function () {
+    console.log(this.isNew);
+    this.is_new = this.isNew;
+    if (this.isModified("password")) {
+        this.password = await (0, bcrypt_1.hash)(this.password, 12);
+        console.log(this);
+    }
+});
+exports.UserSchema.post("save", function () {
+    const that = this;
+    if (that.is_new) {
+        //logic
+    }
+});
+// el pre validate htsht8l abl el built in validation
 const UserModel = mongoose_1.default.model("User", exports.UserSchema);
 exports.default = UserModel;
 //# sourceMappingURL=user.model.js.map

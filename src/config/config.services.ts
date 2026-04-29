@@ -6,7 +6,8 @@ dotenv.config({ path: resolve('./.env.' + NODE_ENV) });
 export const config = {
     PORT:Number(process.env.PORT),
     db: {
-        MONGODB_URI:process.env.MONGODB_URI
+        MONGODB_URI: process.env.MONGODB_URI,
+        REDIS_URL:process.env.REDIS_URL
     },
     jwt: {
         ACCESS_KEY:process.env.ACCESS_KEY,
@@ -17,5 +18,6 @@ export const config = {
     email: {
         EMAIL: process.env.EMAIL,
         PASSWORD:process.env.PASSWORD
-    }
+    },
+
 }

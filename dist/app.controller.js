@@ -12,6 +12,7 @@ const config_services_1 = require("./config/config.services");
 const global_error_handler_1 = require("./common/utils/response/global-error-handler");
 const connectionDB_1 = require("./DB/connectionDB");
 const auth_controllers_1 = require("./modules/auth/auth.controllers");
+const redis_services_1 = __importDefault(require("./common/services/redis.services"));
 const limiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 15 * 60 * 1000,
     max: 3,
@@ -22,6 +23,7 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
 });
 const bootstrap = async () => {
     await (0, connectionDB_1.checkConnectionDb)();
+    redis_services_1.default.connect();
     app.use(express_1.default.json(), (0, cors_1.default)());
     app.use((0, helmet_1.default)());
     app.use(limiter);

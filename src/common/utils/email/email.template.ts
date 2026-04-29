@@ -1,4 +1,4 @@
-export const emailTemplate = (OTP:number) => {
+export const emailTemplate = (OTP:string) => {
     return `<div style="font-family: Arial, sans-serif; background-color:#f9f9f9; padding:20px;">
   <div style="max-width:500px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;">
     

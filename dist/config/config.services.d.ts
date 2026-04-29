@@ -2,6 +2,7 @@ export declare const config: {
     PORT: number;
     db: {
         MONGODB_URI: string | undefined;
+        REDIS_URL: string | undefined;
     };
     jwt: {
         ACCESS_KEY: string | undefined;

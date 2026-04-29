@@ -1,11 +1,21 @@
+import { UpdateOptions } from "mongodb";
+import {
+  ModifyResult,
+  MongooseUpdateQueryOptions,
+  UpdateWithAggregationPipeline,
+  UpdateWriteOpResult,
+} from "mongoose";
 import {
   HydratedDocument,
   Model,
+  PopulatePathToRawDocType,
   ProjectionType,
   QueryFilter,
   QueryOptions,
   Types,
   UpdateQuery,
+  Query,
+  AnyObject,
 } from "mongoose";
 
 abstract class BaseRepository<TDocument> {
@@ -32,18 +42,6 @@ abstract class BaseRepository<TDocument> {
     projection?: ProjectionType<TDocument>;
   }): Promise<HydratedDocument<TDocument> | null> {
     return this.model.findById(id, projection);
-    }
-    
-  async findByIdAndReplace({
-      id,
-      update,
-    options,
-  }: {
-    id: Types.ObjectId,
-    update: UpdateQuery<TDocument>,
-      options: QueryOptions<TDocument>
-  }): Promise<HydratedDocument<TDocument> | null> {
-    return this.model.findByIdAndUpdate(id, update, options);
   }
 
   async find({
@@ -61,9 +59,72 @@ abstract class BaseRepository<TDocument> {
     options,
   }: {
     id: Types.ObjectId;
-    options: QueryOptions<TDocument>
+    options: QueryOptions<TDocument>;
   }): Promise<HydratedDocument<TDocument> | null> {
     return this.model.findByIdAndDelete(id, options);
+  }
+  async findByIdAndUpdate({
+    id,
+    options,
+  }: {
+    id: Types.ObjectId;
+    options: QueryOptions<TDocument>;
+  }): Promise<HydratedDocument<TDocument> | null> {
+    let query = this.model.findByIdAndUpdate(id, options);
+    // if (select) {
+    //     query = query.select(select);
+    // }
+    return await query;
+  }
+  async findOneAndUpdate({
+    filter = {},
+    update = {},
+    options,
+  }: {
+    filter: QueryFilter<TDocument>;
+    update: UpdateQuery<TDocument>;
+    options: QueryOptions<TDocument>;
+  }): Promise<HydratedDocument<TDocument> | null> {
+    let query = this.model.findOneAndUpdate(filter, update, options);
+    if (options.select) {
+      query = query.select(options.select);
+    }
+    return await query;
+  }
+
+  async findByIdAndReplace({
+    filter,
+    replacement,
+    options,
+  }: {
+    filter: Query<any, any>;
+    replacement: TDocument | AnyObject;
+    options: QueryOptions<TDocument> | null;
+  }): Promise<HydratedDocument<TDocument> | null> {
+    return await this.model.findOneAndReplace(filter, replacement, options);
+  }
+
+  async updateMany({
+    filter,
+    update,
+    options,
+  }: {
+    filter: QueryFilter<TDocument>;
+    update: UpdateQuery<TDocument> | UpdateWithAggregationPipeline;
+    options?: (UpdateOptions & MongooseUpdateQueryOptions<TDocument>) | null;
+  }): Promise<UpdateWriteOpResult> {
+    return await this.model.updateMany(filter, update, options);
+  }
+  async updateOne({
+    filter,
+    update,
+    options,
+  }: {
+    filter: QueryFilter<TDocument>;
+    update: UpdateQuery<TDocument> | UpdateWithAggregationPipeline;
+    options: (UpdateOptions & MongooseUpdateQueryOptions<TDocument>) | null;
+  }): Promise<UpdateWriteOpResult> {
+    return await this.model.updateOne(filter, update, options);
   }
 }
 

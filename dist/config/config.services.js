@@ -12,7 +12,8 @@ dotenv_1.default.config({ path: (0, path_1.resolve)('./.env.' + NODE_ENV) });
 exports.config = {
     PORT: Number(process.env.PORT),
     db: {
-        MONGODB_URI: process.env.MONGODB_URI
+        MONGODB_URI: process.env.MONGODB_URI,
+        REDIS_URL: process.env.REDIS_URL
     },
     jwt: {
         ACCESS_KEY: process.env.ACCESS_KEY,
@@ -23,6 +24,6 @@ exports.config = {
     email: {
         EMAIL: process.env.EMAIL,
         PASSWORD: process.env.PASSWORD
-    }
+    },
 };
 //# sourceMappingURL=config.services.js.map

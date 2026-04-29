@@ -14,14 +14,34 @@ class BaseRepository {
     async findById({ id, projection, }) {
         return this.model.findById(id, projection);
     }
-    async findByIdAndReplace({ id, update, options, }) {
-        return this.model.findByIdAndUpdate(id, update, options);
-    }
     async find({ filter, projection, }) {
         return this.model.findById(filter, projection);
     }
     async findByIdAndDelete({ id, options, }) {
         return this.model.findByIdAndDelete(id, options);
+    }
+    async findByIdAndUpdate({ id, options, }) {
+        let query = this.model.findByIdAndUpdate(id, options);
+        // if (select) {
+        //     query = query.select(select);
+        // }
+        return await query;
+    }
+    async findOneAndUpdate({ filter = {}, update = {}, options, }) {
+        let query = this.model.findOneAndUpdate(filter, update, options);
+        if (options.select) {
+            query = query.select(options.select);
+        }
+        return await query;
+    }
+    async findByIdAndReplace({ filter, replacement, options, }) {
+        return await this.model.findOneAndReplace(filter, replacement, options);
+    }
+    async updateMany({ filter, update, options, }) {
+        return await this.model.updateMany(filter, update, options);
+    }
+    async updateOne({ filter, update, options, }) {
+        return await this.model.updateOne(filter, update, options);
     }
 }
 exports.default = BaseRepository;

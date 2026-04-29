@@ -1,4 +1,6 @@
-import mongoose, { Model, Types } from "mongoose";
+import { hash } from "bcrypt";
+import mongoose, { HydratedDocument, Model, Types } from "mongoose";
+import { providerEnum } from "../common/enum/user.enum";
 
 export interface IUser {
   firstName: string;
@@ -13,7 +15,8 @@ export interface IUser {
   followers: Types.ObjectId[];
   followings: Types.ObjectId[];
   isConfirmed: boolean;
-  user:object
+  user: object;
+  provider: providerEnum;
 }
 export const UserSchema = new mongoose.Schema<IUser>({
   firstName: {
@@ -33,7 +36,9 @@ export const UserSchema = new mongoose.Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
+    required: function (this: IUser) {
+      return this.provider === providerEnum.system ? true : false;
+    },
   },
   gender: {
     type: String,
@@ -63,6 +68,7 @@ export const UserSchema = new mongoose.Schema<IUser>({
     type: Boolean,
     default: false,
   },
+  provider: {},
 });
 UserSchema.virtual("userName")
   .get(function () {
@@ -74,5 +80,21 @@ UserSchema.virtual("userName")
       lastName: value.split(" ")[1],
     });
   });
+UserSchema.pre("save", async function (this:HydratedDocument<IUser>&{is_new:boolean}) {
+  console.log(this.isNew);
+  this.is_new=this.isNew
+  
+  if (this.isModified("password")) {
+    this.password = await hash(this.password, 12);
+    console.log(this);
+  }
+});
+UserSchema.post("save", function () {
+  const that= this as HydratedDocument<IUser> & { is_new: boolean }
+  if (that.is_new) {
+    //logic
+  }
+})
+// el pre validate htsht8l abl el built in validation
 const UserModel: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 export default UserModel;

@@ -1,4 +1,5 @@
 import mongoose, { Model, Types } from "mongoose";
+import { providerEnum } from "../common/enum/user.enum";
 export interface IUser {
     firstName: string;
     lastName: string;
@@ -13,6 +14,7 @@ export interface IUser {
     followings: Types.ObjectId[];
     isConfirmed: boolean;
     user: object;
+    provider: providerEnum;
 }
 export declare const UserSchema: mongoose.Schema<IUser, mongoose.Model<IUser, any, any, any, any, any, IUser>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, IUser, mongoose.Document<unknown, {}, IUser, {
     id: string;
@@ -132,6 +134,15 @@ export declare const UserSchema: mongoose.Schema<IUser, mongoose.Model<IUser, an
         id: string;
     }>;
     user?: mongoose.SchemaDefinitionProperty<object, IUser, mongoose.Document<unknown, {}, IUser, {
+        id: string;
+    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & {
+        id: string;
+    }>;
+    provider?: mongoose.SchemaDefinitionProperty<providerEnum, IUser, mongoose.Document<unknown, {}, IUser, {
         id: string;
     }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
         _id: Types.ObjectId;
