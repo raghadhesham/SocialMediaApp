@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser, SignupRequest } from "../../auth.dto";
+import { SignupRequest } from "../../auth.dto";
 import UserModel from "../../models/user.model";
 import { Model, QueryFilter } from "mongoose";
 import UserRepository from "../../DB/repository/user.repository";
@@ -113,4 +113,5 @@ export class AuthService {
       throw new AppError("User doesn't exist or already confirmed", 400);
     }
   };
+
 }

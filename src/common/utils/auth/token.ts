@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { config } from "../../../config/config.services";
 import { AppError } from "../response/global-error-handler";
 import { Types } from "mongoose";
-import { IUser } from "../../../auth.dto"; 
+import { IUser } from "../../../models/user.model";
 
 export const generateAccessToken = (payload: IUser) => {
   const jwtId = randomUUID();

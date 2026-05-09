@@ -13,6 +13,7 @@ import { authRouter } from "./modules/auth/auth.controllers";
 import redisServices from "./common/services/redis.services";
 import UserRepository from "./DB/repository/user.repository";
 import UserModel from "./models/user.model";
+import userRouter from "./modules/user/user.controllers";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -25,16 +26,19 @@ const limiter = rateLimit({
   },
 }); 
 const bootstrap = async () => {
- await checkConnectionDb();
+  const _userRepo = new UserRepository(UserModel)
+  _userRepo.test()
+  await checkConnectionDb();
   redisServices.connect()
   app.use(express.json(), cors());
   app.use(helmet());
-  app.use(limiter);
-  app.use("/auth",authRouter)
+  // app.use(limiter);
+  app.use("/user",userRouter)
+  app.use("/auth", authRouter)
   app.get("/", (req: Request, res: Response) => {
     res.status(200).json({ message: "Hi! Welcome to our app!" });
   });
-  
+ 
   app.use("{/*demo}", (req: Request, res: Response) => {
     throw new AppError(
       `Url ${req.originalUrl} with method ${req.method} not found!`,

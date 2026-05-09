@@ -3,9 +3,8 @@ import {
   extractTokenFromHeaders,
   verifyAccessToken,
 } from "../utils/auth/token";
-import { IUser } from "../../auth.dto";
 import { Types } from "mongoose";
-import userModel from "../../models/user.model";
+import userModel, { IUser } from "../../models/user.model";
 import BaseRepository from "../../DB/repository/base.repository";
 import UserRepository from "../../DB/repository/user.repository";
 declare global {

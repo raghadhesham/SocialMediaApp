@@ -11,9 +11,4 @@ export type SignupRequest = {
   profilePicture: string;
   coverPicture: string;
 };
-export interface IUser {
-  _id: Types.ObjectId;
-  email: string;
-  role: string;
-  user: SignupRequest;
-}
+
