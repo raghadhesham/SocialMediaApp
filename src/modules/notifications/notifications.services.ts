@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import admin from "firebase-admin";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { config } from "../../config/config.services";
 class NotificationService {
   private readonly _client: admin.app.App;
   constructor() {
@@ -14,7 +15,7 @@ class NotificationService {
     console.log("============================");
     this._client = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-        projectId: "social-media-app-cf98b",
+        projectId: config.firebase.projectId!,
 
     });
   }
