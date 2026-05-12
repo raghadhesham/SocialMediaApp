@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 const app: Application = express();
@@ -14,6 +14,7 @@ import redisServices from "./common/services/redis.services";
 import UserRepository from "./DB/repository/user.repository";
 import UserModel from "./models/user.model";
 import userRouter from "./modules/user/user.controllers";
+import notificationsServices from "./modules/notifications/notifications.services";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -24,21 +25,38 @@ const limiter = rateLimit({
       429,
     );
   },
-}); 
+});
 const bootstrap = async () => {
-  const _userRepo = new UserRepository(UserModel)
-  _userRepo.test()
+  const _userRepo = new UserRepository(UserModel);
+  _userRepo.test();
   await checkConnectionDb();
-  redisServices.connect()
+  redisServices.connect();
   app.use(express.json(), cors());
   app.use(helmet());
   // app.use(limiter);
-  app.use("/user",userRouter)
-  app.use("/auth", authRouter)
+  app.post(
+    "/send-notification",
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        await notificationsServices.sendNotification({
+          token: req.body.token,
+          notification: { 
+            title: "Hello World",
+            body: "This is a test notification",
+          },
+        });
+        console.log(req.body.token);
+        res.status(200).json({ message: "Notification sent" });
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+  app.use("/user", userRouter);
+  app.use("/auth", authRouter);
   app.get("/", (req: Request, res: Response) => {
     res.status(200).json({ message: "Hi! Welcome to our app!" });
   });
- 
   app.use("{/*demo}", (req: Request, res: Response) => {
     throw new AppError(
       `Url ${req.originalUrl} with method ${req.method} not found!`,

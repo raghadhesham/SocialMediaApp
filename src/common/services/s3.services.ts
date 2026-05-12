@@ -8,6 +8,7 @@ import { randomUUID } from "node:crypto";
 import { StoreEnum } from "../enum/multer.enum";
 import { createReadStream } from "node:fs";
 import { Upload } from "@aws-sdk/lib-storage";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 export class S3Service {
   private _client: S3Client;
   constructor() {
@@ -42,14 +43,15 @@ export class S3Service {
       ContentType: file.mimetype,
     });
     console.log(command);
-    
+
     if (!command.input.Key) {
       throw new Error("Failed to upload file :(");
     }
     await this._client.send(command);
     return command.input.Key;
   }
-  async uploadLargeFile({file,
+  async uploadLargeFile({
+    file,
     storage,
     path = "General",
     ACL,
@@ -58,7 +60,8 @@ export class S3Service {
     storage?: StoreEnum;
     path?: string;
     ACL?: ObjectCannedACL;
-  }) { // law a2l mn 5GB msh htrda trf3holk
+  }) {
+    // law a2l mn 5GB msh htrda trf3holk
     // for larger files more than 5GB
     const upload = new Upload({
       client: this._client,
@@ -67,12 +70,32 @@ export class S3Service {
         Key: `social_media_app/${path}/${randomUUID()}__large_file.txt`,
         Body: createReadStream(file.path),
       },
-    })
+    });
     upload.on("httpUploadProgress", (progress) => {
-    console.log(`File upload progress is ::: `, progress);
-  });
-  return await upload.done();
+      console.log(`File upload progress is ::: `, progress);
+    });
+    return await upload.done();
 
     // res.status(200).json({ message: "Large File uploaded",data:result.Key });
+  }
+  async createPreSigenedUrl({
+    path = "General",
+    ACL,
+    ContentType,
+    originalName,
+  }: {
+    path?: string;
+    ACL?: ObjectCannedACL;
+    ContentType?: string;
+    originalName: string;
+  }) {
+    const command = new PutObjectCommand({
+      Bucket: config.aws.S3_BUCKET_NAME,
+      ACL,
+      Key: `social_media_app/${path}/${randomUUID()}__${originalName}`,
+      // ContentType,
+    });
+    const url = await getSignedUrl(this._client, command, { expiresIn: 3600 });
+    return url;
   }
 }

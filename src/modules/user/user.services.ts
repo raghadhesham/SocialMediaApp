@@ -32,6 +32,19 @@ class UserService {
     console.log(req.file);
     res.status(200).json({ message: "file uploaded", data: key });
   };
+  createPreSigenedUrl = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const url = await this.s3Service.createPreSigenedUrl({
+      path: "pre",
+      ACL: "public-read",
+      ContentType: req.body.ContentType,
+      originalName: req.body.originalName,
+    });
+    res.status(200).json({ message: "Pre-signed URL created", data: url });
+  };
 }
 
 export default UserService;

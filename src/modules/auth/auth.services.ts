@@ -53,12 +53,13 @@ export class AuthService {
     });
   };
   signin = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+    const { email, password,fcm } = req.body;
     res.status(200).json({
       message: "User signed in successfully",
       data: {
         email,
         password,
+        fcm,
       },
     });
   };
