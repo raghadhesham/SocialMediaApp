@@ -7,7 +7,7 @@ class NotificationService {
   private readonly _client: admin.app.App;
   constructor() {
     const serviceAccount = JSON.parse(
-      readFileSync("src\\config\\social-media-app-cf98b-firebase-adminsdk-fbsvc-06cc6f8ea9.json", "utf-8"),
+      readFileSync(config.firebase.jsonPath!, "utf-8"),
     );
     console.log("=== SERVICE ACCOUNT INFO ===");
     console.log("project_id:", serviceAccount.project_id);
