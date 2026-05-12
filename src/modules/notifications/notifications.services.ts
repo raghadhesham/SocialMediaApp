@@ -1,22 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import admin from "firebase-admin";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { config } from "../../config/config.services";
 class NotificationService {
   private readonly _client: admin.app.App;
   constructor() {
-    const serviceAccount = JSON.parse(
-      readFileSync(config.firebase.jsonPath!, "utf-8"),
-    );
     console.log("=== SERVICE ACCOUNT INFO ===");
-    console.log("project_id:", serviceAccount.project_id);
-    console.log("client_email:", serviceAccount.client_email);
+    console.log("project_id:", config.firebase.projectId);
+    console.log("client_email:", config.firebase.clientEmail);
     console.log("============================");
     this._client = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert({
         projectId: config.firebase.projectId!,
-
+        clientEmail: config.firebase.clientEmail!,
+        privateKey: config.firebase.privateKey!,
+      }),
+      projectId: config.firebase.projectId!,
     });
   }
 
