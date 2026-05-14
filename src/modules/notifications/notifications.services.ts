@@ -1,36 +1,33 @@
 import { NextFunction, Request, Response } from "express";
 import admin from "firebase-admin";
-import { config } from "../../config/config.services";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
 class NotificationService {
   private readonly _client: admin.app.App;
   constructor() {
-    console.log("=== SERVICE ACCOUNT INFO ===");
-    console.log("project_id:", config.firebase.projectId);
-    console.log("client_email:", config.firebase.clientEmail);
-    console.log("============================");
+
+    const service=JSON.parse(readFileSync(resolve(__dirname,"../../config/social-media-app-cf98b-firebase-adminsdk-fbsvc-00d81959a0.json")) as any)
     this._client = admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: config.firebase.projectId!,
-        clientEmail: config.firebase.clientEmail!,
-        privateKey: config.firebase.privateKey!,
-      }),
-      projectId: config.firebase.projectId!,
+      credential: admin.credential.cert(
+        service
+      ),
     });
   }
 
   async sendNotification({
     token,
-    notification,
+    data,
   }: {
     token: string;
-    notification: {
+    data: {
       title: string;
       body: string;
     };
   }) {
     const message = {
       token,
-      notification,
+      data,
     };
 
     return await this._client.messaging().send(message);

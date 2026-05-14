@@ -50,8 +50,8 @@ abstract class BaseRepository<TDocument> {
   }: {
     filter: QueryFilter<TDocument>;
     projection?: ProjectionType<TDocument>;
-  }): Promise<HydratedDocument<TDocument> | null> {
-    return this.model.findById(filter, projection);
+  }): Promise<HydratedDocument<TDocument>[]> {
+    return this.model.find(filter, projection);
   }
 
   async findByIdAndDelete({

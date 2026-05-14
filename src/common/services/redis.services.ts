@@ -1,6 +1,7 @@
 import { createClient, RedisClientType } from "redis";
 import { config } from "../../config/config.services";
 import { AppError } from "../utils/response/global-error-handler";
+import { Types } from "mongoose";
 
 class RedisService {
   private readonly _client: RedisClientType;
@@ -85,7 +86,25 @@ class RedisService {
     return `otp::${email}::${subject}`;
   };
   ban_key = (email: string, subject: string) => {
-    return `banned::${this.otp_key( email, subject )}`;
+    return `banned::${this.otp_key(email, subject)}`;
   };
+  key(userId: Types.ObjectId) {
+    return `user:FCM:${userId}`;
+  }
+   async addFCM(userId: Types.ObjectId, FCMToken: string) {
+    return await this._client.sAdd(this.key(userId), FCMToken);
+  }
+  async removeFCM(userId: Types.ObjectId, FCMToken: string) {
+    return await this._client.sRem(this.key(userId), FCMToken);
+  }
+  async getFCM(userId: Types.ObjectId) {
+    return await this._client.sMembers(this.key(userId));
+  }
+  async hasFCM(userId: Types.ObjectId) {
+    return await this._client.sCard(this.key(userId));
+  }
+  async removeFCMUser(userId: Types.ObjectId) {
+    return await this._client.del(this.key(userId));
+  }
 }
 export default new RedisService();

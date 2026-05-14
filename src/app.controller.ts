@@ -9,12 +9,14 @@ import {
   globalErrorHandler,
 } from "./common/utils/response/global-error-handler";
 import { checkConnectionDb } from "./DB/connectionDB";
-import { authRouter } from "./modules/auth/auth.controllers";
+import { authRouter } from "./modules/auth/auth.controllers"; 
 import redisServices from "./common/services/redis.services";
 import UserRepository from "./DB/repository/user.repository";
 import UserModel from "./models/user.model";
 import userRouter from "./modules/user/user.controllers";
 import notificationsServices from "./modules/notifications/notifications.services";
+import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import { createHandler } from "graphql-http/lib/use/express";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -37,21 +39,37 @@ const bootstrap = async () => {
   app.post(
     "/send-notification",
     async (req: Request, res: Response, next: NextFunction) => {
-      try {
+      
         await notificationsServices.sendNotification({
           token: req.body.token,
-          notification: { 
+          data: { 
             title: "Hello World",
             body: "This is a test notification",
           },
         });
-        console.log(req.body.token);
-        res.status(200).json({ message: "Notification sent" });
-      } catch (error) {
-        next(error);
-      }
+     
     },
   );
+  const schema = new GraphQLSchema({
+    query: new GraphQLObjectType({
+      name: "query",
+      fields: {
+        hello: {
+          type: GraphQLString,
+          resolve: () => {
+            return "hello"
+          }
+        },
+        salma: {
+          type: GraphQLString,
+          resolve: () => { 
+            return "salma"
+          }
+        }
+      }
+    })
+  }) 
+  app.use("/graphql",createHandler({schema}))
   app.use("/user", userRouter);
   app.use("/auth", authRouter);
   app.get("/", (req: Request, res: Response) => {

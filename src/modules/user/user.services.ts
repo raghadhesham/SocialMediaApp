@@ -31,7 +31,7 @@ class UserService {
     console.log(key);
     console.log(req.file);
     res.status(200).json({ message: "file uploaded", data: key });
-  };
+  }; 
   createPreSigenedUrl = async (
     req: Request,
     res: Response,
@@ -39,7 +39,7 @@ class UserService {
   ) => {
     const url = await this.s3Service.createPreSigenedUrl({
       path: "pre",
-      ACL: "public-read",
+      // ACL: "public-read",
       ContentType: req.body.ContentType,
       originalName: req.body.originalName,
     });

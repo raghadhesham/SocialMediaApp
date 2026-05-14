@@ -1,28 +1,28 @@
 import mongoose, { Types } from "mongoose";
-import { AllowCommentsEnum, AvailabilityEnum } from "../common/enum/post.enum";
+import { ModelEnum } from "../common/enum/model.enum";
 
-export interface IPost {
+export interface IComment {
   content?: String;
   attachments?: String;
   mention?: Types.ObjectId;
   reactions?: Types.ObjectId;
   author: Types.ObjectId;
-  availability: AvailabilityEnum;
-  allowComment: AllowCommentsEnum;
   folderId?: Types.ObjectId;
+  refId: Types.ObjectId;
+  onModel: ModelEnum;
 }
-const postSchema = new mongoose.Schema<IPost>({
+const CommentSchema = new mongoose.Schema<IComment>({
   content: {
     type: String,
     min: 1,
-        required: function (this) {
-        return !this.attachments?.length
+    required: function (this) {
+      return !this.attachments?.length;
     },
   },
   attachments: {
     type: [String],
     required: function (this) {
-      return !this.content
+      return !this.content;
     },
   },
   folderId: {
@@ -43,17 +43,20 @@ const postSchema = new mongoose.Schema<IPost>({
     ref: "User",
     required: true,
   },
-  availability: {
-    type: Number,
-    enum: Object.values(AvailabilityEnum),
-    default: AvailabilityEnum.public,
+  refId: {
+    type: mongoose.Schema.Types.ObjectId,
+    refPath: "onModel",
+    required: true,
   },
-  allowComment: {
-    type: Number,
-    enum: Object.values(AllowCommentsEnum),
-    default: AllowCommentsEnum.allow,
+  onModel: {
+    type: String,
+    required: true,
   },
 });
-
-const PostModel = mongoose.model<IPost>("Post", postSchema)
-export default PostModel
+CommentSchema.virtual("replies", {
+  "ref": "Comment",
+  localField: "_id",
+  foreignField:"refId"
+})
+const commentModel = mongoose.model<IComment>("Comment", CommentSchema);
+export default commentModel;

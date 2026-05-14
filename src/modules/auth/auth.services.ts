@@ -53,7 +53,11 @@ export class AuthService {
     });
   };
   signin = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password,fcm } = req.body;
+    const { email, password, fcm } = req.body;
+    // const user = await find
+    if (fcm) {
+      // await redisServices.addFCM(user._id,fcm)
+    }
     res.status(200).json({
       message: "User signed in successfully",
       data: {
@@ -63,6 +67,7 @@ export class AuthService {
       },
     });
   };
+
   sendOTP = async (email: string, subject: string) => {
     const OTP = (await generateOTP()) as unknown as string;
     await sendEmail({

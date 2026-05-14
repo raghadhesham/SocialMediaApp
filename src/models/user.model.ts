@@ -17,8 +17,8 @@ export interface IUser {
   user: object;
   provider: providerEnum;
   deletedAt: Date;
-  role: string
-  _id:Types.ObjectId
+  role: string;
+  _id: Types.ObjectId;
 }
 export const UserSchema = new mongoose.Schema<IUser>(
   {
@@ -114,5 +114,5 @@ UserSchema.post("findOne", function () {
     return { ...rest, deteledAt: { $exists: false } };
   }
 });
-const UserModel: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
+const UserModel = mongoose.model<IUser>("User", UserSchema);
 export default UserModel;
