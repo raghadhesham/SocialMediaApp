@@ -1,0 +1,372 @@
+{
+  "info": {
+    "name": "Missing Endpoints",
+    "_postman_id": "missing-endpoints-collection",
+    "description": "Postman collection for endpoints not covered in PostService.postman_collection.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from /auth/signin response"
+    }
+  ],
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "Welcome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Health-check / welcome endpoint."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Hi! Welcome to our app!\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Send Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/send-notification",
+              "host": ["{{baseUrl}}"],
+              "path": ["send-notification"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<FCM_DEVICE_TOKEN>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Send a Firebase Cloud Messaging push notification to a device token. The title and body are hardcoded on the server ('Hello World' / 'This is a test notification')."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "GraphQL – hello",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ hello }\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Query the GraphQL endpoint for the 'hello' field. Returns the string 'hello'."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"hello\": \"hello\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "GraphQL – salma",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ salma }\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Query the GraphQL endpoint for the 'salma' field. Returns the string 'salma'."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": {\n    \"salma\": \"salma\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"P@ssw0rd123\",\n  \"confirmPassword\": \"P@ssw0rd123\",\n  \"gender\": \"male\",\n  \"DOB\": \"1995-06-15\",\n  \"profilePicture\": \"\",\n  \"coverPicture\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Register a new user. `password` and `confirmPassword` must match."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"User created successfully\",\n  \"data\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"<hashed_password>\",\n    \"gender\": \"male\",\n    \"DOB\": \"1995-06-15\"\n  }\n}"
+            },
+            {
+              "name": "400 Passwords Do Not Match",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Passwords do not match\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signin"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"P@ssw0rd123\",\n  \"fcm\": \"<optional_FCM_device_token>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Authenticate an existing user. `fcm` is an optional Firebase Cloud Messaging token used to register the device for push notifications."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"User signed in successfully\",\n  \"data\": {\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"P@ssw0rd123\",\n    \"fcm\": \"<FCM_device_token>\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Upload Image (profile picture)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/upload-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "upload-image"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Image file to upload (stored in memory and streamed to S3 under the 'profilePics' path)"
+                }
+              ]
+            },
+            "description": "Upload a profile picture. Uses in-memory multer storage and uploads directly to S3 under the 'profilePics/' prefix."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"file uploaded\",\n  \"data\": \"profilePics/<uuid>-filename.jpg\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Large File (video)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/upload-large-file",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "upload-large-file"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "video",
+                  "type": "file",
+                  "src": [],
+                  "description": "Video or large file to upload (buffered to disk first, then streamed to S3 under the 'videos' path)"
+                }
+              ]
+            },
+            "description": "Upload a large file (e.g. video). Uses disk-based multer storage to avoid memory exhaustion before streaming to S3 under the 'videos/' prefix."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"file uploaded\",\n  \"data\": \"videos/<uuid>-filename.mp4\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Pre-signed URL",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/create-presigned-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "create-presigned-url"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ContentType\": \"image/jpeg\",\n  \"originalName\": \"my-photo.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Generate an S3 pre-signed PUT URL so the client can upload a file directly to S3 without routing the bytes through the server. `ContentType` is the MIME type of the file; `originalName` is used to derive the S3 object key under the 'pre/' prefix."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Pre-signed URL created\",\n  \"data\": \"https://s3.amazonaws.com/<bucket>/pre/<uuid>-my-photo.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...&X-Amz-Signature=...\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

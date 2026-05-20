@@ -9,8 +9,14 @@ import { config } from "../../config/config.services";
 import { emailTemplate } from "../../common/utils/email/email.template";
 import redisServices from "../../common/services/redis.services";
 import { AppError } from "../../common/utils/response/global-error-handler";
+import {
+  createTokenPayload,
+  extractTokenFromHeaders,
+  generateAccessToken,
+  generateRefreshToken, 
+} from "../../common/utils/auth/token";
 export class AuthService {
-  private readonly _userRepo = new UserRepository(UserModel);
+  private readonly _userRepo = new UserRepository(UserModel); 
   constructor() {}
   signup = async (req: Request, res: Response, next: NextFunction) => {
     let {
@@ -53,17 +59,28 @@ export class AuthService {
     });
   };
   signin = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, fcm } = req.body;
-    // const user = await find
+    const { email, password, fcm } = req.body; 
+    const user = await this._userRepo.findOne({ filter: { email } });
+    if (!user) {
+      throw new AppError("Invalid credentials, wasn't found", 401);
+    }
+    const isMatch = await compare(password, user.password);
+    console.log(user);
+    
+    if (!isMatch) {
+      throw new AppError("Invalid credentials, doesn't match", 401);
+    }
+    const payload = createTokenPayload(user);
+    const accessToken = generateAccessToken(payload as any);
+    const refreshToken = generateRefreshToken(payload as any);
     if (fcm) {
-      // await redisServices.addFCM(user._id,fcm)
+      // await redisServices.addFCM(user._id, fcm)
     }
     res.status(200).json({
       message: "User signed in successfully",
       data: {
-        email,
-        password,
-        fcm,
+        accessToken,
+        refreshToken,
       },
     });
   };

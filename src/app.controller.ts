@@ -17,6 +17,8 @@ import userRouter from "./modules/user/user.controllers";
 import notificationsServices from "./modules/notifications/notifications.services";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { createHandler } from "graphql-http/lib/use/express";
+import postRouter from "./modules/post/post.controllers";
+import commentRouter from "./modules/comment/comment.controllers";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -35,7 +37,7 @@ const bootstrap = async () => {
   redisServices.connect();
   app.use(express.json(), cors());
   app.use(helmet());
-  // app.use(limiter);
+  app.use(limiter);
   app.post(
     "/send-notification",
     async (req: Request, res: Response, next: NextFunction) => {
@@ -71,6 +73,8 @@ const bootstrap = async () => {
   }) 
   app.use("/graphql",createHandler({schema}))
   app.use("/user", userRouter);
+  app.use("/posts", postRouter);
+  app.use("/posts", commentRouter);
   app.use("/auth", authRouter);
   app.get("/", (req: Request, res: Response) => {
     res.status(200).json({ message: "Hi! Welcome to our app!" });

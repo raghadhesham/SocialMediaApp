@@ -1,4 +1,3 @@
-import { hash } from "bcrypt";
 import mongoose, { HydratedDocument, Model, Types } from "mongoose";
 import { providerEnum } from "../common/enum/user.enum";
 export interface IUser {
@@ -87,18 +86,18 @@ UserSchema.virtual("userName")
       lastName: value.split(" ")[1],
     });
   });
-UserSchema.pre(
-  "save",
-  async function (this: HydratedDocument<IUser> & { is_new: boolean }) {
-    console.log(this.isNew);
-    this.is_new = this.isNew;
+// UserSchema.pre(
+//   "save",
+//   async function (this: HydratedDocument<IUser> & { is_new: boolean }) {
+//     console.log(this.isNew);
+//     this.is_new = this.isNew;
 
-    if (this.isModified("password")) {
-      this.password = await hash(this.password, 12);
-      console.log(this);
-    }
-  },
-);
+//     if (this.isModified("password")) {
+//       this.password = await hash(this.password, 12);
+//       console.log(this);
+//     }
+//   },
+// );
 UserSchema.post("save", function () {
   const that = this as HydratedDocument<IUser> & { is_new: boolean };
   if (that.is_new) {

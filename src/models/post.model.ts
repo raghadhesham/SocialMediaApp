@@ -2,9 +2,8 @@ import mongoose, { Types } from "mongoose";
 import { AllowCommentsEnum, AvailabilityEnum } from "../common/enum/post.enum";
 
 export interface IPost {
-  content?: String;
-  attachments?: String;
-  mention?: Types.ObjectId;
+  content?: string;
+  attachments?: string[];
   reactions?: Types.ObjectId;
   author: Types.ObjectId;
   availability: AvailabilityEnum;
@@ -21,6 +20,7 @@ const postSchema = new mongoose.Schema<IPost>({
   },
   attachments: {
     type: [String],
+    default: [],
     required: function (this) {
       return !this.content
     },
@@ -28,29 +28,19 @@ const postSchema = new mongoose.Schema<IPost>({
   folderId: {
     type: mongoose.Schema.Types.ObjectId,
   },
-  mention: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "User",
-  },
-  reactions: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
   availability: {
-    type: Number,
-    enum: Object.values(AvailabilityEnum),
+    type: String,
+    enum: AvailabilityEnum,
     default: AvailabilityEnum.public,
   },
   allowComment: {
-    type: Number,
-    enum: Object.values(AllowCommentsEnum),
+    type: String,
+    enum: AllowCommentsEnum,
     default: AllowCommentsEnum.allow,
   },
 });

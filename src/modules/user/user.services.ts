@@ -40,7 +40,7 @@ class UserService {
     const url = await this.s3Service.createPreSigenedUrl({
       path: "pre",
       // ACL: "public-read",
-      ContentType: req.body.ContentType,
+      // ContentType: req.body.ContentType,
       originalName: req.body.originalName,
     });
     res.status(200).json({ message: "Pre-signed URL created", data: url });

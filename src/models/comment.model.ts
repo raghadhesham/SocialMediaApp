@@ -2,14 +2,15 @@ import mongoose, { Types } from "mongoose";
 import { ModelEnum } from "../common/enum/model.enum";
 
 export interface IComment {
-  content?: String;
-  attachments?: String;
-  mention?: Types.ObjectId;
-  reactions?: Types.ObjectId;
+  content?: string;
+  attachments?: string[];
+  mention?: Types.ObjectId[];
+  reactions?: Types.ObjectId[];
   author: Types.ObjectId;
   folderId?: Types.ObjectId;
   refId: Types.ObjectId;
   onModel: ModelEnum;
+  _id:Types.ObjectId
 }
 const CommentSchema = new mongoose.Schema<IComment>({
   content: {

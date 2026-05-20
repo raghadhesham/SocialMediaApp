@@ -30,7 +30,7 @@ export const authenticate = async (
   req.role = decoded.role
   req.user = decoded
   const userRepository = new UserRepository(userModel);
-  const user = await userRepository.findById({id:req.userId!});
+  const user = await userRepository.findById({_id:req.userId!});
   if (!user) {
     throw new Error("user doesn't exist");
   }

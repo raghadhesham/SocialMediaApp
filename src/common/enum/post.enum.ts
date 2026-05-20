@@ -4,6 +4,6 @@ export enum AvailabilityEnum{
     public="public"
 }
 export enum AllowCommentsEnum{
-    deny,
-    allow
+    deny="deny",
+    allow="allow"
 }

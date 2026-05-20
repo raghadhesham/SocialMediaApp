@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Post Service",
+    "_postman_id": "post-service-collection",
+    "description": "Postman collection for the Post Service endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from /auth login response"
+    }
+  ],
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post (text only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/post",
+              "host": ["{{baseUrl}}"],
+              "path": ["post"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello world! This is my first post.\",\n  \"availability\": \"public\",\n  \"allowComment\": \"allow\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a text-only post. Either `content` or `attachments` must be provided."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"_id\": \"665f1a2b3c4d5e6f7a8b9c0d\",\n    \"content\": \"Hello world! This is my first post.\",\n    \"availability\": \"public\",\n    \"allowComment\": 1,\n    \"author\": \"665f1a2b3c4d5e6f7a8b9c01\",\n    \"attachments\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Post (with attachment)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/post",
+              "host": ["{{baseUrl}}"],
+              "path": ["post"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "value": "Check out this photo!",
+                  "type": "text"
+                },
+                {
+                  "key": "availability",
+                  "value": "friends",
+                  "type": "text",
+                  "description": "Options: only_me | friends | public"
+                },
+                {
+                  "key": "allowComment",
+                  "value": "allow",
+                  "type": "text",
+                  "description": "Options: allow | deny"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": [],
+                  "description": "Attach one or more files (images, videos, etc.)"
+                }
+              ]
+            },
+            "description": "Create a post with file attachments. Triggers S3 pre-signed URL generation. Response includes the pre-signed URL for uploading the file directly to S3."
+          },
+          "response": [
+            {
+              "name": "201 Created (with S3 pre-signed URL)",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"_id\": \"665f1a2b3c4d5e6f7a8b9c0d\",\n    \"content\": \"Check out this photo!\",\n    \"availability\": \"friends\",\n    \"allowComment\": 1,\n    \"author\": \"665f1a2b3c4d5e6f7a8b9c01\",\n    \"attachments\": \"https://s3.amazonaws.com/bucket/Posts/post_attachment?X-Amz-Signature=...\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Post (private, no comments)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/post",
+              "host": ["{{baseUrl}}"],
+              "path": ["post"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"My private note to self.\",\n  \"availability\": \"only_me\",\n  \"allowComment\": \"deny\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a private post visible only to the author with comments disabled."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

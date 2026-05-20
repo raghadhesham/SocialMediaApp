@@ -35,13 +35,13 @@ abstract class BaseRepository<TDocument> {
   }
 
   async findById({
-    id,
+    _id,
     projection,
   }: {
-    id: Types.ObjectId;
+    _id: Types.ObjectId;
     projection?: ProjectionType<TDocument>;
   }): Promise<HydratedDocument<TDocument> | null> {
-    return this.model.findById(id, projection);
+    return this.model.findById(_id, projection);
   }
 
   async find({

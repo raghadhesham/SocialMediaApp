@@ -50,6 +50,39 @@ export class S3Service {
     await this._client.send(command);
     return command.input.Key;
   }
+  async uploadFiles({
+    files,
+    storage,
+    path = "General",
+    ACL,
+  }: {
+    files: Express.Multer.File[];
+    storage?: StoreEnum;
+    path?: string;
+    ACL?: ObjectCannedACL;
+  }) {
+    const uploadedFiles: string[] = [];
+    for (const file of files) {
+      const command = new PutObjectCommand({
+        Bucket: config.aws.S3_BUCKET_NAME,
+        ACL,
+        Key: `social_media_app/${path}/${randomUUID()}__${file.originalname}`,
+        Body:
+          storage === StoreEnum.memory
+            ? file.buffer
+            : createReadStream(file.path),
+        ContentType: file.mimetype,
+      });
+      console.log(command);
+      if (!command.input.Key) {
+        throw new Error("Failed to upload file :(");
+      }
+      await this._client.send(command);
+      uploadedFiles.push(command.input.Key)
+    }
+    return uploadedFiles;
+  }
+
   async uploadLargeFile({
     file,
     storage,
@@ -81,19 +114,16 @@ export class S3Service {
   async createPreSigenedUrl({
     path = "General",
     ACL,
-    ContentType,
     originalName,
   }: {
     path?: string;
     ACL?: ObjectCannedACL;
-    ContentType?: string;
     originalName: string;
   }) {
     const command = new PutObjectCommand({
       Bucket: config.aws.S3_BUCKET_NAME,
       ACL,
       Key: `social_media_app/${path}/${randomUUID()}__${originalName}`,
-      // ContentType,
     });
     const url = await getSignedUrl(this._client, command, { expiresIn: 3600 });
     return url;

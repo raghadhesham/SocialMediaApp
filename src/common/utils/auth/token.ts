@@ -1,12 +1,14 @@
 import { randomUUID } from "node:crypto";
 import * as jwt from "jsonwebtoken";
-import { config } from "../../../config/config.services";
 import { AppError } from "../response/global-error-handler";
 import { Types } from "mongoose";
 import { IUser } from "../../../models/user.model";
+import { config } from "../../../config/config.services";
 
 export const generateAccessToken = (payload: IUser) => {
   const jwtId = randomUUID();
+  console.log("exp", config.jwt.ACCESS_TOKEN_EXPIRES_IN);
+
   return jwt.sign(payload, config.jwt.ACCESS_KEY as string, {
     expiresIn: config.jwt.ACCESS_TOKEN_EXPIRES_IN as any,
     jwtid: jwtId,
@@ -15,13 +17,15 @@ export const generateAccessToken = (payload: IUser) => {
 export const generateRefreshToken = (payload: IUser) => {
   const jwtId = randomUUID();
   return jwt.sign(payload, config.jwt.REFRESH_KEY as string, {
-    expiresIn: Number(config.jwt.REFRESH_TOKEN_EXPIRES_IN),
+    expiresIn: config.jwt.REFRESH_TOKEN_EXPIRES_IN as any,
     jwtid: jwtId,
   });
 };
 export const verifyAccessToken = (token: string) => {
   try {
-    return jwt.verify(token, config.jwt.ACCESS_KEY as string) as IUser
+    console.log(token);
+
+    return jwt.verify(token, config.jwt.ACCESS_KEY as string) as IUser;
   } catch (error: any) {
     if (error.name === "TokenExpiredError") {
       throw new AppError("Token has Expired", 401);
@@ -55,11 +59,15 @@ export const createTokenPayload = (user: IUser) => {
   };
 };
 export const extractTokenFromHeaders = (authHeaders: string) => {
-  if (!authHeaders) {
-    throw new AppError("No Token provided", 401);
+  try {
+    if (!authHeaders) {
+      throw new AppError("No Token provided", 401);
+    }
+    if (!authHeaders.startsWith("bearer ")) {
+      throw new AppError("Invalid Prefix", 401);
+    }
+    return authHeaders.split(" ")[1];
+  } catch (error) {
+    console.log(error);
   }
-  if (!authHeaders.startsWith("bearer ")) {
-    throw new AppError("Invalid Prefix", 401);
-  }
-  return authHeaders.split(" ")[1];
 };
