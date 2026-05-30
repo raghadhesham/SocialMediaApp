@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import * as jwt from "jsonwebtoken";
 import { AppError } from "../response/global-error-handler";
 import { Types } from "mongoose";
-import { IUser } from "../../../models/user.model";
+import { IUser } from "../../../DB/models/user.model";
 import { config } from "../../../config/config.services";
 
 export const generateAccessToken = (payload: IUser) => {

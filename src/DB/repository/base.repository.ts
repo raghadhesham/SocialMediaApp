@@ -122,7 +122,7 @@ abstract class BaseRepository<TDocument> {
   }: {
     filter: QueryFilter<TDocument>;
     update: UpdateQuery<TDocument> | UpdateWithAggregationPipeline;
-    options: (UpdateOptions & MongooseUpdateQueryOptions<TDocument>) | null;
+    options?: (UpdateOptions & MongooseUpdateQueryOptions<TDocument>) | null;
   }): Promise<UpdateWriteOpResult> {
     return await this.model.updateOne(filter, update, options);
   }

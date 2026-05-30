@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import PostRepository from "../../DB/repository/post.repository";
-import PostModel, { IPost } from "../../models/post.model";
+import PostModel, { IPost } from "../../DB/models/post.model";
 import { AllowCommentsEnum } from "../../common/enum/post.enum";
 import { AppError } from "../../common/utils/response/global-error-handler";
 import UserRepository from "../../DB/repository/user.repository";
-import UserModel from "../../models/user.model";
+import UserModel from "../../DB/models/user.model";
 import { ModelEnum } from "../../common/enum/model.enum";
-import commentModel, { IComment } from "../../models/comment.model";
+import commentModel, { IComment } from "../../DB/models/comment.model";
 import CommentRepository from "../../DB/repository/comment.repository";
 import { HydratedDocument, Types } from "mongoose";
 import { PostAvailability } from "../../common/utils/post.utils";
@@ -23,7 +23,7 @@ class CommentService {
       throw new AppError("Comment ID is required for replies", 400);
     }
     if (onModel == ModelEnum.comment && commentId) {
-      const parentComment  = await this._commentRepo.findOne({
+      const parentComment = await this._commentRepo.findOne({
         filter: {
           _id: commentId,
           refId: postId!,
@@ -71,9 +71,12 @@ class CommentService {
     const comment = await this._commentRepo.create({
       content,
       author: new Types.ObjectId(req.userId),
-      refId: new Types.ObjectId(onModel === ModelEnum.comment ? commentId as string : postId! as string),
+      refId: new Types.ObjectId(
+        onModel === ModelEnum.comment
+          ? (commentId as string)
+          : (postId! as string),
+      ),
       onModel,
-
     });
     res.status(201).json({ message: "Comment created successfully", comment });
   };

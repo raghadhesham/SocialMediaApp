@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SignupRequest } from "../../auth.dto";
-import UserModel from "../../models/user.model";
+import UserModel from "../../DB/models/user.model";
 import { Model, QueryFilter } from "mongoose";
 import UserRepository from "../../DB/repository/user.repository";
 import { compare, hash } from "bcrypt";
@@ -13,10 +13,10 @@ import {
   createTokenPayload,
   extractTokenFromHeaders,
   generateAccessToken,
-  generateRefreshToken, 
+  generateRefreshToken,
 } from "../../common/utils/auth/token";
 export class AuthService {
-  private readonly _userRepo = new UserRepository(UserModel); 
+  private readonly _userRepo = new UserRepository(UserModel);
   constructor() {}
   signup = async (req: Request, res: Response, next: NextFunction) => {
     let {
@@ -59,14 +59,14 @@ export class AuthService {
     });
   };
   signin = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, fcm } = req.body; 
+    const { email, password, fcm } = req.body;
     const user = await this._userRepo.findOne({ filter: { email } });
     if (!user) {
       throw new AppError("Invalid credentials, wasn't found", 401);
     }
     const isMatch = await compare(password, user.password);
     console.log(user);
-    
+
     if (!isMatch) {
       throw new AppError("Invalid credentials, doesn't match", 401);
     }
@@ -136,5 +136,4 @@ export class AuthService {
       throw new AppError("User doesn't exist or already confirmed", 400);
     }
   };
-
 }

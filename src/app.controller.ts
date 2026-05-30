@@ -8,20 +8,26 @@ import {
   AppError,
   globalErrorHandler,
 } from "./common/utils/response/global-error-handler";
-import { checkConnectionDb } from "./DB/connectionDB";
-import { authRouter } from "./modules/auth/auth.controllers"; 
+import { checkConnectionDb } from "./DB/mongoDB/connectionDB";
+import { authRouter } from "./modules/auth/auth.controllers";
 import redisServices from "./common/services/redis.services";
 import UserRepository from "./DB/repository/user.repository";
-import UserModel from "./models/user.model";
+import UserModel from "./DB/models/user.model";
 import userRouter from "./modules/user/user.controllers";
-import notificationsServices from "./modules/notifications/notifications.services";
-import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import {
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString,
+} from "graphql";
 import { createHandler } from "graphql-http/lib/use/express";
 import postRouter from "./modules/post/post.controllers";
 import commentRouter from "./modules/comment/comment.controllers";
+import { notificationRouter } from "./modules/notifications/notifications.controllers";
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 3,
+  max: 60,
   legacyHeaders: false,
   handler: (req: Request, res: Response, next: Function) => {
     throw new AppError(
@@ -38,40 +44,54 @@ const bootstrap = async () => {
   app.use(express.json(), cors());
   app.use(helmet());
   app.use(limiter);
-  app.post(
-    "/send-notification",
-    async (req: Request, res: Response, next: NextFunction) => {
-      
-        await notificationsServices.sendNotification({
-          token: req.body.token,
-          data: { 
-            title: "Hello World",
-            body: "This is a test notification",
-          },
-        });
-     
+  let queryObject = new GraphQLObjectType({
+    name: "getUser",
+    fields: {
+      id: { type: GraphQLString },
+      name: { type: GraphQLString },
+      age: { type: GraphQLString },
+      email: { type: GraphQLString },
     },
-  );
+  });
+  const users = [
+    { id: 1, name: "Raghad", age: 25, email: "raghad@example.com" },
+    { id: 2, name: "Ahmad", age: 30, email: "ahmad@example.com" },
+    { id: 3, name: "Sara", age: 28, email: "sara@example.com" },
+  ];
   const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
-      name: "query",
+      // GraphQLObjectType:name fields description
+      name: "query", // unique, alphanumeric, doesn't have spaces, can't start with a number
       fields: {
-        hello: {
-          type: GraphQLString,
-          resolve: () => {
-            return "hello"
-          }
+        // object, bemathabet apis
+        users: {
+          // get 3la slash hello
+          type: queryObject, // type el data elly ray7a
+          description: "A simple hello world query",
+          args: {
+            id: {
+              // a graphql id is meant to be a unique identifier, not something that is human-readable.
+              type: GraphQLString,
+            },
+          },
+          resolve: (parent, args): object => {
+            return users.find((user) => args.id == user.id)!; // logic el code
+          },
         },
-        salma: {
-          type: GraphQLString,
-          resolve: () => { 
-            return "salma"
-          }
-        }
-      }
-    })
-  }) 
-  app.use("/graphql",createHandler({schema}))
+        listUsers: {
+          type: new GraphQLList(queryObject),
+
+          description: "A simple list users query",
+          resolve: (): object[] => {
+            return users; // logic el code
+          },
+        },
+      },
+      description: "The root query type.",
+    }),
+  });
+  app.use("/", notificationRouter);
+  app.use("/graphql", createHandler({ schema }));
   app.use("/user", userRouter);
   app.use("/posts", postRouter);
   app.use("/posts", commentRouter);

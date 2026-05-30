@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import { ModelEnum } from "../common/enum/model.enum";
+import { ModelEnum } from "../../common/enum/model.enum";
 
 export interface IComment {
   content?: string;
@@ -10,7 +10,7 @@ export interface IComment {
   folderId?: Types.ObjectId;
   refId: Types.ObjectId;
   onModel: ModelEnum;
-  _id:Types.ObjectId
+  _id: Types.ObjectId;
 }
 const CommentSchema = new mongoose.Schema<IComment>({
   content: {
@@ -55,9 +55,9 @@ const CommentSchema = new mongoose.Schema<IComment>({
   },
 });
 CommentSchema.virtual("replies", {
-  "ref": "Comment",
+  ref: "Comment",
   localField: "_id",
-  foreignField:"refId"
-})
+  foreignField: "refId",
+});
 const commentModel = mongoose.model<IComment>("Comment", CommentSchema);
 export default commentModel;

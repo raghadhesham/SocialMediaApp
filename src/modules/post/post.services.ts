@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import PostModel from "../../models/post.model";
+import PostModel from "../../DB/models/post.model";
 import PostRepository from "../../DB/repository/post.repository";
 import { S3Service } from "../../common/services/s3.services";
 import UserRepository from "../../DB/repository/user.repository";
-import UserModel from "../../models/user.model";
+import UserModel from "../../DB/models/user.model";
 import { StoreEnum } from "../../common/enum/multer.enum";
 
 class PostService {
@@ -18,7 +18,7 @@ class PostService {
     });
     let urls: string[] = [];
     console.log(req.files);
-    
+
     if (req?.files) {
       urls = await this._s3Service.uploadFiles({
         path: "files",
@@ -33,12 +33,12 @@ class PostService {
       author: author!._id,
       attachments: urls,
     });
-      await post.save();
-      res.status(201).json({
-        message: "Post created successfully",
-        post,
-      });
-    }
+    await post.save();
+    res.status(201).json({
+      message: "Post created successfully",
+      post,
+    });
   };
+}
 
 export default new PostService();

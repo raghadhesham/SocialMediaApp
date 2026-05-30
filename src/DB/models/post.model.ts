@@ -1,5 +1,8 @@
 import mongoose, { Types } from "mongoose";
-import { AllowCommentsEnum, AvailabilityEnum } from "../common/enum/post.enum";
+import {
+  AllowCommentsEnum,
+  AvailabilityEnum,
+} from "../../common/enum/post.enum";
 
 export interface IPost {
   content?: string;
@@ -14,15 +17,15 @@ const postSchema = new mongoose.Schema<IPost>({
   content: {
     type: String,
     min: 1,
-        required: function (this) {
-        return !this.attachments?.length
+    required: function (this) {
+      return !this.attachments?.length;
     },
   },
   attachments: {
     type: [String],
     default: [],
     required: function (this) {
-      return !this.content
+      return !this.content;
     },
   },
   folderId: {
@@ -45,5 +48,5 @@ const postSchema = new mongoose.Schema<IPost>({
   },
 });
 
-const PostModel = mongoose.model<IPost>("Post", postSchema)
-export default PostModel
+const PostModel = mongoose.model<IPost>("Post", postSchema);
+export default PostModel;

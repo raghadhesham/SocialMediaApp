@@ -1,5 +1,5 @@
 import mongoose, { HydratedDocument, Model, Types } from "mongoose";
-import { providerEnum } from "../common/enum/user.enum";
+import { providerEnum } from "../../common/enum/user.enum";
 export interface IUser {
   firstName: string;
   lastName: string;
