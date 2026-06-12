@@ -88,23 +88,38 @@ class RedisService {
   ban_key = (email: string, subject: string) => {
     return `banned::${this.otp_key(email, subject)}`;
   };
-  key(userId: Types.ObjectId) {
+  socketKey(userId: Types.ObjectId) {
     return `user:FCM:${userId}`;
   }
    async addFCM(userId: Types.ObjectId, FCMToken: string) {
-    return await this._client.sAdd(this.key(userId), FCMToken);
+    return await this._client.sAdd(this.socketKey(userId), FCMToken);
   }
   async removeFCM(userId: Types.ObjectId, FCMToken: string) {
-    return await this._client.sRem(this.key(userId), FCMToken);
+    return await this._client.sRem(this.socketKey(userId), FCMToken);
   }
   async getFCM(userId: Types.ObjectId) {
-    return await this._client.sMembers(this.key(userId));
+    return await this._client.sMembers(this.socketKey(userId));
   }
   async hasFCM(userId: Types.ObjectId) {
-    return await this._client.sCard(this.key(userId));
+    return await this._client.sCard(this.socketKey(userId));
   }
   async removeFCMUser(userId: Types.ObjectId) {
-    return await this._client.del(this.key(userId));
+    return await this._client.del(this.socketKey(userId));
+  }
+   async addSocket(userId: Types.ObjectId, SocketToken: string) {
+    return await this._client.sAdd(this.socketKey(userId), SocketToken);
+  }
+  async removeSocket(userId: Types.ObjectId, SocketToken: string) {
+    return await this._client.sRem(this.socketKey(userId), SocketToken);
+  }
+  async getSocket(userId: Types.ObjectId) {
+    return await this._client.sMembers(this.socketKey(userId));
+  }
+  async hasSocket(userId: Types.ObjectId) {
+    return await this._client.sCard(this.socketKey(userId));
+  }
+  async removeSocketUser(userId: Types.ObjectId) {
+    return await this._client.del(this.socketKey(userId));
   }
 }
 export default new RedisService();

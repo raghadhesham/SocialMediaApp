@@ -15,6 +15,7 @@ import UserRepository from "./DB/repository/user.repository";
 import UserModel from "./DB/models/user.model";
 import userRouter from "./modules/user/user.controllers";
 import {
+  GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
   GraphQLSchema,
@@ -24,6 +25,12 @@ import { createHandler } from "graphql-http/lib/use/express";
 import postRouter from "./modules/post/post.controllers";
 import commentRouter from "./modules/comment/comment.controllers";
 import { notificationRouter } from "./modules/notifications/notifications.controllers";
+import { Server } from "socket.io";
+import {
+  authenticate,
+  decode_token_and_fetch_user,
+} from "./common/middleware/authentication";
+import { hash } from "bcrypt";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -89,6 +96,52 @@ const bootstrap = async () => {
       },
       description: "The root query type.",
     }),
+    mutation: new GraphQLObjectType({
+      name: "Mutation",
+      description: "First Mutation",
+      fields: {
+        addUser: {
+          type: new GraphQLObjectType({
+            name: "AddUser",
+            fields: {
+              firstName: { type: GraphQLString },
+              lastName: { type: GraphQLString },
+              email: { type: GraphQLString },
+              password: { type: GraphQLString },
+              gender: { type: GraphQLString },
+              DOB: { type: GraphQLString },
+            },
+          }),
+          args: {
+            firstName: { type: GraphQLString },
+            lastName: { type: GraphQLString },
+            email: { type: GraphQLString },
+            password: { type: GraphQLString },
+            gender: { type: GraphQLString },
+            DOB: { type: GraphQLString },
+          },
+          resolve: async (_, args) => {
+            let { firstName, lastName, email, password, gender, DOB } = args;
+            let userExists = await UserModel.findOne({
+              email,
+            });
+            if (userExists) {
+              throw new Error("user exists");
+            }
+            const hashedPassword = await hash(password, 12);            
+            const user=await UserModel.create({
+              firstName,
+              lastName,
+              email,
+              password: hashedPassword,
+              gender,
+              DOB,
+            });
+            return user;
+          },
+        },
+      },
+    }),
   });
   app.use("/", notificationRouter);
   app.use("/graphql", createHandler({ schema }));
@@ -106,8 +159,30 @@ const bootstrap = async () => {
     );
   });
   app.use(globalErrorHandler);
-  app.listen(config.PORT, () => {
+  const httpServer = app.listen(config.PORT, () => {
     console.log(`Server is running on PORT ${config.PORT}`);
+  });
+  const io = new Server(httpServer, {
+    cors: {
+      origin: "*",
+    },
+  });
+  io.on("connection", (socket) => {
+    console.log(socket.id);
+    socket.on("Hi", (data) => {
+      // socket.emit("SayHi",{"message":"Hi from backend"})
+      // socket.broadcast.emit("SayHi",{"message":"Hi from backend"})
+      console.log("data.socketId ", data.socketId);
+
+      io.to(data.socketId).emit("SayHi", { message: "Hi from backend" });
+    });
+  });
+  io.use(async (socket, next) => {
+    const user = await decode_token_and_fetch_user(
+      socket.handshake.auth.authorization,
+    );
+    socket.data.user = user;
+    next();
   });
 };
 export default bootstrap;

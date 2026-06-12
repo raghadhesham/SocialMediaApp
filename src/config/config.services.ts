@@ -5,6 +5,8 @@ dotenv.config({ path: resolve("./.env." + NODE_ENV) });
 // export const ACCESS_TOKEN_KEY: string=process.env.
 export const config = {
   PORT: Number(process.env.PORT),
+  USER_PREFIX: process.env.ACCESS_USER_PREFIX,
+  ADMIN_PREFIX: process.env.ACCESS_ADMIN_PREFIX,
   db: {
     MONGODB_URI: process.env.MONGODB_URI,
     REDIS_URL: process.env.REDIS_URL,
